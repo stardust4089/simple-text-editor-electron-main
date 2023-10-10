@@ -7,7 +7,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-
   <!-- KaTeX dependency -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.css"
     integrity="sha384-bYdxxUwYipFNohQlHt0bjN/LCpueqWz13HufFEV1SUatKs1cm4L6fFgCi1jT643X" crossorigin="anonymous">
@@ -42,14 +41,14 @@
 <body>
   <div class="title-bar">
     
-    <span class="document-name" id="documentName">no file selected</span>
+    <!-- <span class="document-name" id="documentName">no file selected</span> -->
     <div class="menu-section">
       <button id="openDocumentBtn">
         <span class="material-icons"> launch </span>
       </button>
-      <button id="createDocumentBtn">
+      <!-- <button id="createDocumentBtn">
         <span class="material-icons"> note_add </span>
-      </button>
+      </button> -->
       <button id="saveDocumentBtn">
         <span class="material-icons"> save </span>
       </button>
@@ -65,6 +64,9 @@
 
   <!-- Initialize Quill editor -->
   <script>
+    var { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
+    var path = require('path');
+    var fs = require('fs');
     var toolbarOptions = [
 
       ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -82,35 +84,65 @@
 
       ['clean']
     ];
-    var quill = new Quill('#editor', {
-      modules: {
-        formula: true,
-        toolbar: toolbarOptions
-      },
-      theme: 'snow'
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize Quill editor and store it in the quillInstance variable
+      var quillInstance = new Quill('#editor', {
+        modules: {
+          formula: true,
+          toolbar: toolbarOptions
+        },
+        theme: 'snow'
+      });
+
+      // Enable mathquill formula authoring
+      const enableMathQuillFormulaAuthoring = mathquill4quill();
+      enableMathQuillFormulaAuthoring(quillInstance);
+
+      // Define a custom keybinding for a toolbar item
+      quillInstance.keyboard.addBinding({
+        key: 191
+      }, function (range, context) {
+        // Simulate a click event on the bold toolbar button
+        const formulaButton = document.querySelector('.ql-toolbar .ql-formula');
+        if (formulaButton) {
+          formulaButton.click();
+        }
+      });
+
+      // Attach event listeners to your UI elements for saving and loading
+      const saveBtn = document.getElementById('saveDocumentBtn');
+      const openBtn = document.getElementById('openDocumentBtn');
+      saveBtn.addEventListener("click", saveDeltaToFile());
+      openBtn.addEventListener("click", loadDeltaFromFile());
+      function saveDeltaToFile () {
+        const delta = quillInstance.getContents();
+        const deltaJSON = JSON.stringify(delta);
+
+        const filePath = dialog.showSaveDialogSync({ defaultPath: 'document.json' });
+
+        if (filePath) {
+          fs.writeFileSync(filePath, deltaJSON);
+        }
+      };
+
+      function loadDeltaFromFile () {
+        const filePaths = dialog.showOpenDialogSync({ properties: ['openFile'] });
+        console.log('filePaths');
+        console.log(filePaths);
+        if (filePaths && filePaths.length > 0) {
+          const filePath = filePaths[0];
+          try {
+            const deltaJSON = fs.readFileSync(filePath, 'utf-8');
+            const delta = JSON.parse(deltaJSON);
+            console.log(delta);
+            quillInstance.setContents(delta);
+          } catch (error) {
+            console.error('Error loading file:', error);
+          }
+        }
+      };
     });
-    // enable mathquill formula editor
-
-    var enableMathQuillFormulaAuthoring = mathquill4quill();
-    enableMathQuillFormulaAuthoring(quill);
-    // Define a custom keybinding for a toolbar item
-    quill.keyboard.addBinding({
-      key: 191
-    }, function (range, context) {
-      // Simulate a click event on the bold toolbar button
-      const formulaButton = document.querySelector('.ql-toolbar .ql-formula');
-      if (formulaButton) {
-        formulaButton.click(); // Trigger a click event on the bold button
-      }
-    });
-
-
-    
-
   </script>
-  
-  </main>
-  <script src="main.js"></script>
 </body>
 
 </html>

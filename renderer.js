@@ -1,16 +1,22 @@
 
 
 // const { ipcRenderer } = require("electron");
+
+// document.addEventListener('DOMContentLoaded', () => {
+//   document.getElementById("openDocumentBtn").addEventListener("click", () => {
+//     ipcRenderer.send("load-delta", );
+//   });
+  
+//   document.getElementById("saveDocumentBtn").addEventListener("click", () => {
+//     ipcRenderer.send("save-delta");
+//   });
+//   });
 // const path = require("path");
 // const Quill = require("quill");
-// window.addEventListener("DOMContentLoaded", () => {
-//   const el = {
-//     documentName: document.getElementById("documentName"),
-//     createDocumentBtn: document.getElementById("createDocumentBtn"),
-//     openDocumentBtn: document.getElementById("openDocumentBtn"),
-//     saveDocumentBtn: document.getElementById("saveDocumentBtn"),
-//     fileTextarea: document.getElementById("editor"),
-//   };
+// const el = {
+//   openDocumentBtn: document.getElementById("openDocumentBtn"),
+//   saveDocumentBtn: document.getElementById("saveDocumentBtn"),
+// };
 
 //   const handleDocumentChange = (filePath, content = "") => {
 //     el.documentName.innerHTML = path.parse(filePath).base;
@@ -25,14 +31,6 @@
 
 //   el.createDocumentBtn.addEventListener("click", () => {
 //     ipcRenderer.send("create-document-triggered");
-//   });
-
-//   el.openDocumentBtn.addEventListener("click", () => {
-//     ipcRenderer.send("open-document-triggered");
-//   });
-
-//   el.saveDocumentBtn.addEventListener("click", () => {
-//     ipcRenderer.send("save-document-triggered");
 //   });
 
 //   el.fileTextarea.addEventListener("input", (e) => {
