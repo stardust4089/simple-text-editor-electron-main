@@ -97,58 +97,69 @@ const handleError = () => {
     body: "Sorry, something went wrong :(",
   }).show();
 };
-
-const openFile = (filePath) => {
-  fs.readFile(filePath, "utf8", (error, content) => {
-    if (error) {
-      handleError();
-    } else {
-      app.addRecentDocument(filePath);
-      openedFilePath = filePath;
-      mainWindow.webContents.send("document-opened", { filePath, content });
-    }
-  });
-};
-
-app.on("open-file", (_, filePath) => {
-  openFile(filePath);
+// Listen for IPC messages to trigger file operations
+ipcMain.on('save-document-triggered', () => {
+  mainWindow.webContents.send('save-file');
 });
 
-ipcMain.on("open-document-triggered", () => {
-  dialog
-    .showOpenDialog({
-      properties: ["openFile"],
-      filters: [{ name: "text files", extensions: ["txt"] }],
-    })
-    .then(({ filePaths }) => {
-      const filePath = filePaths[0];
-
-      openFile(filePath);
-    });
+ipcMain.on('open-document-triggered', () => {
+  mainWindow.webContents.send('open-file');
 });
 
-ipcMain.on("create-document-triggered", () => {
-  dialog
-    .showSaveDialog(mainWindow, {
-      filters: [{ name: "text files", extensions: ["txt"] }],
-    })
-    .then(({ filePath }) => {
-      fs.writeFile(filePath, "", (error) => {
-        if (error) {
-          handleError();
-        } else {
-          app.addRecentDocument(filePath);
-          openedFilePath = filePath;
-          mainWindow.webContents.send("document-created", filePath);
-        }
-      });
-    });
+ipcMain.on('create-document-triggered', () => {
+  mainWindow.webContents.send('create-file');
 });
+// const openFile = (filePath) => {
+//   fs.readFile(filePath, "utf8", (error, content) => {
+//     if (error) {
+//       handleError();
+//     } else {
+//       app.addRecentDocument(filePath);
+//       openedFilePath = filePath;
+//       mainWindow.webContents.send("document-opened", { filePath, content });
+//     }
+//   });
+// };
 
-ipcMain.on("file-content-updated", (_, textareaContent) => {
-  fs.writeFile(openedFilePath, textareaContent, (error) => {
-    if (error) {
-      handleError();
-    }
-  });
-});
+// app.on("open-file", (_, filePath) => {
+//   openFile(filePath);
+// });
+
+// ipcMain.on("open-document-triggered", () => {
+//   dialog
+//     .showOpenDialog({
+//       properties: ["openFile"],
+//       filters: [{ name: "text files", extensions: ["txt"] }],
+//     })
+//     .then(({ filePaths }) => {
+//       const filePath = filePaths[0];
+
+//       openFile(filePath);
+//     });
+// });
+
+// ipcMain.on("create-document-triggered", () => {
+//   dialog
+//     .showSaveDialog(mainWindow, {
+//       filters: [{ name: "text files", extensions: ["txt"] }],
+//     })
+//     .then(({ filePath }) => {
+//       fs.writeFile(filePath, "", (error) => {
+//         if (error) {
+//           handleError();
+//         } else {
+//           app.addRecentDocument(filePath);
+//           openedFilePath = filePath;
+//           mainWindow.webContents.send("document-created", filePath);
+//         }
+//       });
+//     });
+// });
+
+// ipcMain.on("file-content-updated", (_, textareaContent) => {
+//   fs.writeFile(openedFilePath, textareaContent, (error) => {
+//     if (error) {
+//       handleError();
+//     }
+//   });
+// });
