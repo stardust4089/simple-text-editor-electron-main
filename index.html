@@ -32,7 +32,6 @@
   <script src="mathquill4quill.js"></script>
   <link rel="stylesheet" href="mathquill4quill.css">
 
-
   <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
   <title>Document</title>
@@ -40,15 +39,12 @@
 
 <body>
   <div class="title-bar">
-    
-    <!-- <span class="document-name" id="documentName">no file selected</span> -->
+
+    <span class="document-name" id="documentName">no file selected</span>
     <div class="menu-section">
       <button id="openDocumentBtn">
         <span class="material-icons"> launch </span>
       </button>
-      <!-- <button id="createDocumentBtn">
-        <span class="material-icons"> note_add </span>
-      </button> -->
       <button id="saveDocumentBtn">
         <span class="material-icons"> save </span>
       </button>
@@ -56,50 +52,48 @@
     </div>
   </div>
 
-  <div id="editor" disabled>
+  <main class="demo-container">
+    <div id="editor"></div>
+    <div><textarea id="delta-output" style="display: none;" type="textarea"></textarea></div>
+    <div><textarea id="delta-input" style="display: none;" type="textarea"></textarea></div>
+  </main>
 
   </div>
-  <!-- Include the Quill library -->
-  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
-  <!-- Initialize Quill editor -->
-  <script>
-    var { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
-    var path = require('path');
-    var fs = require('fs');
-    var toolbarOptions = [
+</body>
+<script>  var toolbarOptions = [
 
-      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-      ['formula'],
-      ['blockquote', 'code-block'],
-      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-      [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
-      [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
+    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+    ['formula'],
+    ['blockquote', 'code-block'],
+    [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+    [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
+    [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
 
-      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-      // [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+    [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+    // [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
 
-      [{ 'font': [] }],
+    [{ 'font': [] }],
 
-      ['clean']
-    ];
-    document.addEventListener('DOMContentLoaded', () => {
-      // Initialize Quill editor and store it in the quillInstance variable
-      var quillInstance = new Quill('#editor', {
+    ['clean']
+  ];
+  (function ($, Quill) {
+    $(document).ready(() => {
+      const quillOptions = {
         modules: {
           formula: true,
           toolbar: toolbarOptions
         },
-        theme: 'snow'
-      });
+        placeholder:
+          "weasel rat <3",
+        theme: "snow"
+      };
 
-      // Enable mathquill formula authoring
-      const enableMathQuillFormulaAuthoring = mathquill4quill();
-      enableMathQuillFormulaAuthoring(quillInstance);
-
-      // Define a custom keybinding for a toolbar item
-      quillInstance.keyboard.addBinding({
+      const enableMathQuillFormulaAuthoring = window.mathquill4quill();
+      const quill = new Quill("#editor", quillOptions);
+      enableMathQuillFormulaAuthoring(quill);
+      quill.keyboard.addBinding({
         key: 191
       }, function (range, context) {
         // Simulate a click event on the bold toolbar button
@@ -109,40 +103,38 @@
         }
       });
 
-      // Attach event listeners to your UI elements for saving and loading
-      const saveBtn = document.getElementById('saveDocumentBtn');
-      const openBtn = document.getElementById('openDocumentBtn');
-      saveBtn.addEventListener("click", saveDeltaToFile());
-      openBtn.addEventListener("click", loadDeltaFromFile());
-      function saveDeltaToFile () {
-        const delta = quillInstance.getContents();
-        const deltaJSON = JSON.stringify(delta);
+      quill.keyboard.addBinding({
+        key: 'A'
+      }, function (range, context) {
+        quill.setText("[{\"insert\":\"beans\n\"}]");
+        quill.setContents(JSON.parse(document.getElementById("delta-input").value));
+        console.log(JSON.stringify(quill.getContents()));
+      });
 
-        const filePath = dialog.showSaveDialogSync({ defaultPath: 'document.json' });
+      quill.on('text-change', function (delta, oldDelta, source) {
+        document.getElementById("delta-output").value = JSON.stringify(quill.getContents());
+      });
+      function myFunction() {
+      if (document.getElementById("delta-input").value != "") {
+        quill.setContents(JSON.parse(document.getElementById("delta-input").value));
+        document.getElementById("delta-input").value = "";
+      }
+    }
 
-        if (filePath) {
-          fs.writeFileSync(filePath, deltaJSON);
-        }
-      };
+    // Call the function immediately
+    myFunction();
 
-      function loadDeltaFromFile () {
-        const filePaths = dialog.showOpenDialogSync({ properties: ['openFile'] });
-        console.log('filePaths');
-        console.log(filePaths);
-        if (filePaths && filePaths.length > 0) {
-          const filePath = filePaths[0];
-          try {
-            const deltaJSON = fs.readFileSync(filePath, 'utf-8');
-            const delta = JSON.parse(deltaJSON);
-            console.log(delta);
-            quillInstance.setContents(delta);
-          } catch (error) {
-            console.error('Error loading file:', error);
-          }
-        }
-      };
+    // Set up a timer to run the function every 10 seconds (10000 milliseconds)
+    setInterval(myFunction, 1);
     });
-  </script>
-</body>
+    
+  })(window.jQuery, window.Quill);</script>
+
+
+
+
+<script>
+
+</script>
 
 </html>

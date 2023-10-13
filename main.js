@@ -1,13 +1,12 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
-
 const isDevEnv = process.env.NODE_ENV === 'development';
 
 if (isDevEnv) {
   try {
     require('electron-reloader')(module);
-  } catch {}
+  } catch { }
 }
 
 let mainWindow;
@@ -22,6 +21,7 @@ const createWindow = () => {
       preload: path.join(app.getAppPath(), 'renderer.js')
     }
   });
+
 
   if (isDevEnv) {
     mainWindow.webContents.openDevTools();
@@ -80,6 +80,7 @@ const createWindow = () => {
 
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
+  
 };
 
 app.whenReady().then(createWindow);
@@ -87,11 +88,59 @@ app.whenReady().then(createWindow);
 
 
 // IPC handlers for your renderer process events
-ipcMain.on('save-delta', (event, quill) => {
-  saveDeltaToFile(quill);
+ipcMain.on('text-change', function(delta, oldDelta, source) {
+  console.log("text-change");
+  if (source == 'api') {
+    console.log("An API call triggered this change.");
+  } else if (source == 'user') {
+    console.log("A user action triggered this change.");
+  }
+  // dialog
+  //   .showSaveDialog(mainWindow, {
+  //     filters: [{ name: "text files", extensions: ["txt"] }],
+  //   })
+  //   .then(({ filePath }) => {
+  //     fs.writeFile(filePath, data, (error) => {
+  //       if (error) {
+  //         handleError();
+  //       } else {
+  //         app.addRecentDocument(filePath);
+  //         openedFilePath = filePath;
+  //         mainWindow.webContents.send("document-created", filePath);
+  //       }
+  //     });
+  //   });
 });
 
-ipcMain.on('load-delta', (event, quill) => {
-  loadDeltaFromFile(quill);
+ipcMain.on('load-delta', () => {
+  console.log("weasels");
 });
+
+
+const openFile = (filePath) => {
+  fs.readFile(filePath, "utf8", (error, content) => {
+    if (error) {
+      handleError();
+    } else {
+      app.addRecentDocument(filePath);
+      openedFilePath = filePath;
+      mainWindow.webContents.send("document-opened", { filePath, content });
+    }
+  });
+};
+
+ipcMain.on("open-document-triggered", () => {
+  dialog
+    .showOpenDialog({
+      properties: ["openFile"],
+      filters: [{ name: "text files", extensions: ["txt"] }],
+    })
+    .then(({ filePaths }) => {
+      const filePath = filePaths[0];
+
+      openFile(filePath);
+    });
+});
+
+
 
