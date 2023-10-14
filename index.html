@@ -39,8 +39,8 @@
 
 <body>
   <div class="title-bar">
-
     <span class="document-name" id="documentName">no file selected</span>
+
     <div class="menu-section">
       <button id="openDocumentBtn">
         <span class="material-icons"> launch </span>
@@ -48,14 +48,14 @@
       <button id="createDocumentBtn">
         <span class="material-icons"> note_add </span>
       </button>
-
     </div>
   </div>
 
   <main class="demo-container">
+    <h1 id="load_files_text">Load A File To Begin Editing</h1>
     <div id="editor"></div>
-    <div><textarea id="delta-output"  type="textarea"></textarea></div>
-    <div><textarea id="delta-input"  type="textarea"></textarea></div>
+    <div><textarea id="delta-output" type="textarea"></textarea></div>
+    <div><textarea id="delta-input" type="textarea"></textarea></div>
   </main>
 
   </div>
@@ -72,7 +72,6 @@
     [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
 
     [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-    // [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
 
     [{ 'font': [] }],
 
@@ -102,32 +101,32 @@
           formulaButton.click();
         }
       });
-
-      // quill.keyboard.addBinding({
-      //   key: 'A'
-      // }, function (range, context) {
-      //   quill.setText("[{\"insert\":\"beans\n\"}]");
-      //   quill.setContents(JSON.parse(document.getElementById("delta-input").value));
-      //   console.log(JSON.stringify(quill.getContents()));
-      // });
+      quill.disable();
+      document.getElementById("editor").style.display = "none";
+      document.getElementsByClassName("ql-toolbar")[0].style.display = "none";
+      document.getElementById("load_files_text").style.display = "block";
 
       quill.on('text-change', function (delta, oldDelta, source) {
         document.getElementById("delta-output").value = JSON.stringify(quill.getContents());
       });
       function myFunction() {
-      if (document.getElementById("delta-input").value != "") {
-        quill.setContents(JSON.parse(document.getElementById("delta-input").value));
-        document.getElementById("delta-input").value = "";
+        if (document.getElementById("delta-input").value != "") {
+          quill.enable();
+          document.getElementById("editor").style.display = "block";
+          document.getElementsByClassName("ql-toolbar")[0].style.display = "block";
+          document.getElementById("load_files_text").style.display = "none";
+          quill.setContents(JSON.parse(document.getElementById("delta-input").value));
+          document.getElementById("delta-input").value = "";
+        }
       }
-    }
 
-    // Call the function immediately
-    myFunction();
+      // Call the function immediately
+      myFunction();
 
-    // Set up a timer to run the function every 10 seconds (10000 milliseconds)
-    setInterval(myFunction, 1);
+      // Set up a timer to run the function every 10 seconds (10000 milliseconds)
+      setInterval(myFunction, 1);
     });
-    
+
   })(window.jQuery, window.Quill);</script>
 
 

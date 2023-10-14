@@ -17,6 +17,9 @@ window.addEventListener('DOMContentLoaded', () => {
     el.documentName.innerHTML = path.parse(filePath).base;
     _filePath = filePath;
     inputText.value = content;
+    if (content == "") {
+      inputText.value = JSON.stringify([{ insert: 'Notes: ' }]);
+    }
   };
 
   function autosave(){
@@ -24,7 +27,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (_filepath == "") return;
     console.log("autosaving");
     ipcRenderer.send("save-document", outputText.value);
-    el.documentName.innerHTML = _filePath + " (saved at " + new Date().toLocaleTimeString() + ")";
+    el.documentName.innerHTML = path.parse(_filePath).base + " (saved at " + new Date().toLocaleTimeString() + ")";
   }
 
   autosave()
