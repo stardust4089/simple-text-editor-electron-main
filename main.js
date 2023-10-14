@@ -2,7 +2,6 @@ const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const isDevEnv = process.env.NODE_ENV === 'development';
-
 if (isDevEnv) {
   try {
     require('electron-reloader')(module);
@@ -26,6 +25,7 @@ const createWindow = () => {
   if (isDevEnv) {
     mainWindow.webContents.openDevTools();
   }
+  // mainWindow.webContents.openDevTools();
 
   mainWindow.loadFile('index.html');
 
@@ -95,25 +95,6 @@ ipcMain.on('text-change', function(delta, oldDelta, source) {
   } else if (source == 'user') {
     console.log("A user action triggered this change.");
   }
-  // dialog
-  //   .showSaveDialog(mainWindow, {
-  //     filters: [{ name: "text files", extensions: ["txt"] }],
-  //   })
-  //   .then(({ filePath }) => {
-  //     fs.writeFile(filePath, data, (error) => {
-  //       if (error) {
-  //         handleError();
-  //       } else {
-  //         app.addRecentDocument(filePath);
-  //         openedFilePath = filePath;
-  //         mainWindow.webContents.send("document-created", filePath);
-  //       }
-  //     });
-  //   });
-});
-
-ipcMain.on('load-delta', () => {
-  console.log("weasels");
 });
 
 

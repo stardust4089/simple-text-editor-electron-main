@@ -1,7 +1,7 @@
 const { ipcRenderer } = require("electron");
 const path = require("path");
-
-const { app } = require('electron');
+const { pdfExporter } = require('quill-to-pdf');
+var FileSaver = require('file-saver');
 
 window.addEventListener('DOMContentLoaded', () => {
   const outputText = document.getElementById("delta-output");
@@ -13,6 +13,9 @@ window.addEventListener('DOMContentLoaded', () => {
     documentName: document.getElementById("documentName"),
     createDocumentBtn: document.getElementById("createDocumentBtn"),
     openDocumentBtn: document.getElementById("openDocumentBtn"),
+    exportDocumentBtn: document.getElementById("exportDocumentBtn"),
+    printDocumentBtn: document.getElementById("printDocumentBtn"),
+    saveDocumentBtn: document.getElementById("saveDocumentBtn"),
   };
 
   const handleDocumentChange = (filePath, content = "") => {
@@ -24,7 +27,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  function autosave(){
+  function autosave() {
     console.log("path" + _filepath)
     if (_filepath == "") return;
     console.log("autosaving");
@@ -40,7 +43,23 @@ window.addEventListener('DOMContentLoaded', () => {
     ipcRenderer.send("load-delta");
   });
 
+  el.printDocumentBtn.addEventListener("click", () => {
+    autosave();
+    print();
+  });
 
+  el.saveDocumentBtn.addEventListener("click", () => { 
+    autosave();
+  });
+
+  el.exportDocumentBtn.addEventListener("click", () => {
+    autosave();
+    exportAsPDF();
+  });
+  const exportAsPDF = async () => {
+    const pdfAsBlob = await pdfExporter.generatePdf(JSON.parse(outputText.value)); // converts to PDF
+    FileSaver.saveAs(pdfAsBlob, "pdf-export.pdf"); // downloads from the browser
+  };
   el.openDocumentBtn.addEventListener("click", () => {
     autosave();
     ipcRenderer.send("open-document-triggered");

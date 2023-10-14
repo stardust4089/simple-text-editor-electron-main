@@ -6,6 +6,19 @@ body {
   flex-direction: column;
   height: 100vh;
 }
+.ql-toolbar .ql-stroke {
+  fill: none;
+  stroke: #fff;
+}
+
+.ql-toolbar .ql-fill {
+  fill: #fff;
+  stroke: none;
+}
+
+.ql-toolbar .ql-picker {
+  color: #fff;
+}
 
 h1 {
   text-align: center;
