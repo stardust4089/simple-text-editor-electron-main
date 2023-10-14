@@ -1,6 +1,8 @@
 const { ipcRenderer } = require("electron");
 const path = require("path");
 
+const { app } = require('electron');
+
 window.addEventListener('DOMContentLoaded', () => {
   const outputText = document.getElementById("delta-output");
   const inputText = document.getElementById("delta-input");
@@ -58,6 +60,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   el.createDocumentBtn.addEventListener("click", () => {
     ipcRenderer.send("create-document-triggered");
+  });
+
+  ipcRenderer.on("save", () => {
+    autosave();
   });
 });
 

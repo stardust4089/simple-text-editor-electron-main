@@ -142,6 +142,9 @@ ipcMain.on("open-document-triggered", () => {
     });
 });
 
+app.on('before-quit', () => {
+  ipcMain.send('save');
+});
 
 ipcMain.on("save-document", (_, textareaContent) => {
   fs.writeFile(openedFilePath, textareaContent, (error) => {
