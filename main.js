@@ -18,6 +18,7 @@ const createWindow = () => {
     icon: __dirname + '/images/iconpng.icns',
     titleBarStyle: 'hiddenInset',
     webPreferences: {
+      spellcheck: true, // Enable spellcheck
       preload: path.join(app.getAppPath(), 'renderer.js')
     }
   });
@@ -26,10 +27,37 @@ const createWindow = () => {
   if (isDevEnv) {
     mainWindow.webContents.openDevTools();
   }
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
+    // // Attach context menu to the webContents
 
+    // // Set up the SpellCheckHandler
+    // SpellCheckHandler.attachTo(webContents);
   mainWindow.loadFile('index.html');
+  const { Menu, MenuItem } = require('electron')
 
+  mainWindow.webContents.on('context-menu', (event, params) => {
+    const menu = new Menu()
+  
+    // Add each spelling suggestion
+    for (const suggestion of params.dictionarySuggestions) {
+      menu.append(new MenuItem({
+        label: suggestion,
+        click: () => mainWindow.webContents.replaceMisspelling(suggestion)
+      }))
+    }
+  
+    // Allow users to add the misspelled word to the dictionary
+    if (params.misspelledWord) {
+      menu.append(
+        new MenuItem({
+          label: 'Add to dictionary',
+          click: () => mainWindow.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord)
+        })
+      )
+    }
+  
+    menu.popup()
+  })
   const menuTemplate = [
     {
       label: "File",
