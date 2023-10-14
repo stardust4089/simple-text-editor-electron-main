@@ -143,4 +143,31 @@ ipcMain.on("open-document-triggered", () => {
 });
 
 
+ipcMain.on("save-document", (_, textareaContent) => {
+  fs.writeFile(openedFilePath, textareaContent, (error) => {
+    if (error) {
+      handleError();
+    }
+  });
+});
+
+
+ipcMain.on("create-document-triggered", () => {
+  dialog
+    .showSaveDialog(mainWindow, {
+      filters: [{ name: "text files", extensions: ["txt"] }],
+    })
+    .then(({ filePath }) => {
+      fs.writeFile(filePath, "", (error) => {
+        if (error) {
+          handleError();
+        } else {
+          app.addRecentDocument(filePath);
+          openedFilePath = filePath;
+          mainWindow.webContents.send("document-created", filePath);
+        }
+      });
+    });
+});
+
 

@@ -45,8 +45,8 @@
       <button id="openDocumentBtn">
         <span class="material-icons"> launch </span>
       </button>
-      <button id="saveDocumentBtn">
-        <span class="material-icons"> save </span>
+      <button id="createDocumentBtn">
+        <span class="material-icons"> note_add </span>
       </button>
 
     </div>
@@ -54,8 +54,8 @@
 
   <main class="demo-container">
     <div id="editor"></div>
-    <div><textarea id="delta-output" style="display: none;" type="textarea"></textarea></div>
-    <div><textarea id="delta-input" style="display: none;" type="textarea"></textarea></div>
+    <div><textarea id="delta-output"  type="textarea"></textarea></div>
+    <div><textarea id="delta-input"  type="textarea"></textarea></div>
   </main>
 
   </div>
@@ -103,13 +103,13 @@
         }
       });
 
-      quill.keyboard.addBinding({
-        key: 'A'
-      }, function (range, context) {
-        quill.setText("[{\"insert\":\"beans\n\"}]");
-        quill.setContents(JSON.parse(document.getElementById("delta-input").value));
-        console.log(JSON.stringify(quill.getContents()));
-      });
+      // quill.keyboard.addBinding({
+      //   key: 'A'
+      // }, function (range, context) {
+      //   quill.setText("[{\"insert\":\"beans\n\"}]");
+      //   quill.setContents(JSON.parse(document.getElementById("delta-input").value));
+      //   console.log(JSON.stringify(quill.getContents()));
+      // });
 
       quill.on('text-change', function (delta, oldDelta, source) {
         document.getElementById("delta-output").value = JSON.stringify(quill.getContents());
