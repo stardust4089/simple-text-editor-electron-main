@@ -36,7 +36,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   autosave()
-  setInterval(autosave, 10000);
+  setInterval(autosave, 1000);
 
   document.getElementById("openDocumentBtn").addEventListener("click", () => {
     autosave();
@@ -84,5 +84,7 @@ window.addEventListener('DOMContentLoaded', () => {
   ipcRenderer.on("save", () => {
     autosave();
   });
+
+
 });
 

@@ -15,6 +15,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 900,
     height: 700,
+    icon: __dirname + '/images/iconpng.icns',
     titleBarStyle: 'hiddenInset',
     webPreferences: {
       preload: path.join(app.getAppPath(), 'renderer.js')
@@ -124,7 +125,7 @@ ipcMain.on("open-document-triggered", () => {
 });
 
 app.on('before-quit', () => {
-  ipcMain.send('save');
+  mainWindow.webContents.send('save');
 });
 
 ipcMain.on("save-document", (_, textareaContent) => {
@@ -153,5 +154,9 @@ ipcMain.on("create-document-triggered", () => {
       });
     });
 });
+
+function handleError(){
+  console.log("cope harder")
+}
 
 

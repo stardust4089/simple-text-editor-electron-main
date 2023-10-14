@@ -1,6 +1,8 @@
 module.exports = {
+  
   packagerConfig: {
     asar: true,
+    icon: 'images/icon' // no file extension required
   },
   rebuildConfig: {},
   makers: [
@@ -20,6 +22,13 @@ module.exports = {
       name: '@electron-forge/maker-rpm',
       config: {},
     },
+    // {
+    //   name: '@electron-forge/maker-dmg',
+    //   config: {
+    //     background: './assets/dmg-background.png',
+    //     format: 'ULFO'
+    //   }
+    // },
   ],
   plugins: [
     {
@@ -28,3 +37,4 @@ module.exports = {
     },
   ],
 };
+
