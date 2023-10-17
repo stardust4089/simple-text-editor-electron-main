@@ -1,6 +1,8 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+
+
 const isDevEnv = process.env.NODE_ENV === 'development';
 if (isDevEnv) {
   try {
@@ -182,6 +184,22 @@ ipcMain.on("create-document-triggered", () => {
       });
     });
 });
+
+ipcMain.on("export-delta", (html) => {
+  console.log("export-delta");
+  dialog
+    .showSaveDialog(mainWindow, {
+      filters: [{ name: "html files", extensions: ["html"] }],
+    })
+    .then(({ filePath }) => {
+      fs.writeFile(filePath, html, (error) => {
+        if (error) {
+          handleError();
+        }
+      });
+    });
+});
+
 
 function handleError(){
   console.log("cope harder")
