@@ -21,7 +21,7 @@ window.addEventListener('DOMContentLoaded', () => {
     openDocumentBtn: document.getElementById("openDocumentBtn"),
     exportDocumentBtn: document.getElementById("exportDocumentBtn"),
     printDocumentBtn: document.getElementById("printDocumentBtn"),
-    saveDocumentBtn: document.getElementById("saveDocumentBtn"),
+    // saveDocumentBtn: document.getElementById("saveDocumentBtn"),
   };
 
     autosave()
@@ -37,9 +37,9 @@ window.addEventListener('DOMContentLoaded', () => {
       print();
     });
 
-    el.saveDocumentBtn.addEventListener("click", () => {
-      autosave();
-    });
+    // el.saveDocumentBtn.addEventListener("click", () => {
+    //   autosave();
+    // });
 
     el.exportDocumentBtn.addEventListener("click", () => {
       autosave();
@@ -54,7 +54,8 @@ window.addEventListener('DOMContentLoaded', () => {
     el.createDocumentBtn.addEventListener("click", () => {
       ipcRenderer.send("create-document-triggered");
     });
-  
+
+
 
   function loadEditor(){
     ipcRenderer.send("load-editor-page");
@@ -74,6 +75,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const { ipcRenderer } = require('electron');
   ipcRenderer.send('loaded-page');
 
+
+
   ipcRenderer.on("recent-files", (event, recentFiles) => {
     let recentFilesElement = document.getElementById('recentFiles');
     // Clear the current list
@@ -82,15 +85,22 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     // Add the recent files to the list
     recentFiles.forEach(file => {
-      let fileElement = document.createElement('div');
-      fileElement.textContent = file;
+      let fileElement = document.createElement('x-card');
+      // fileElement.textContent = file;
+      // fileElement.className = 'pure-button'; // Add a class for styling
       // Add an icon to the file element
-      let iconElement = document.createElement('img');
-      iconElement.src = 'images/description.png'; // Replace with the path to your icon
-      iconElement.className = 'file-icon'; // Add a class for styling
-      fileElement.prepend(iconElement);
-      fileElement.prepend(iconElement);
+      // let iconElement = document.createElement('img');
+      // iconElement.src = 'images/description.png'; // Replace with the path to your icon
+      // iconElement.className = 'file-icon'; // Add a class for styling
+
+      let textElement = document.createElement('p');
+      // let mainElement = document.createElement('main');
+      textElement.textContent = file;
+      fileElement.appendChild(textElement);
+      // fileElement.prepend(iconElement);
       fileElement.addEventListener('click', () => {
+        _filepath = file;
+        ipcRenderer.send("opened-recent-document", file);
         handleDocumentChange(file);
         ipcRenderer.send("add-new-recent-document", file);
       });
@@ -99,10 +109,15 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   function autosave() {
-    if (_filepath == "" || _filepath == null) return;
-    console.log("autosaving path" + _filepath)
+    console.log("Attemting autosaving")
+    console.log("Filepath: " + _filepath)
+    if (_filepath == "" || _filepath == null){
+      console.log("No filepath")
+      return;
+    } 
+    console.log("autosaving path " + _filepath)
     ipcRenderer.send("save-document", outputText.value);
-    el.documentName.innerHTML = path.parse(_filePath).base + " (saved at " + new Date().toLocaleTimeString() + ")";
+    el.documentName.innerHTML = path.parse(_filepath).base + " (saved at " + new Date().toLocaleTimeString() + ")";
   }
 
 

@@ -204,6 +204,10 @@ ipcMain.on("open-document-triggered", () => {
     });
 });
 
+ipcMain.on("opened-recent-document", (_, filePath) => {
+  openFile(filePath);
+});
+
 ipcMain.on("create-document-triggered", () => {
   dialog
     .showSaveDialog(mainWindow, {
@@ -229,6 +233,9 @@ app.on('before-quit', () => {
 });
 
 ipcMain.on("save-document", (_, textareaContent) => {
+  if (openedFilePath == null) { 
+    console.error("filePath was null");
+    return; }
   fs.writeFile(openedFilePath, textareaContent, (error) => {
     if (error) {
       handleError();

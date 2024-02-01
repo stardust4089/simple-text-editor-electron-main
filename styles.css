@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   /* background-color: rgb(0, 0, 0) !important; */
   margin: 0;
@@ -7,15 +11,15 @@ body {
   height: 100vh;
 }
 
-.title-bar {
+/* .title-bar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 999; /* You can adjust the z-index as needed */
+  z-index: 999; You can adjust the z-index as needed */
   /* background-color: #fff; Add your desired background color */
   /* Add any other styling you want for the title bar */
-}
+/* } */
 /* .ql-toolbar .ql-stroke {
   fill: none;
   stroke: #fff;
@@ -34,15 +38,14 @@ h1 {
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
 }
-.title-bar {
+/* .title-bar {
   height: 50px;
   width: 100%;
-  /* background-color: rgb(140, 140, 140); */
   -webkit-app-region: drag;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-}
+} */
 
 .title-bar .document-name,
 .title-bar .menu-section {
@@ -68,49 +71,27 @@ main textarea {
   resize: none;
 }
 
-.title-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  z-index: 999;
-  /* Add any other styling you want for the title bar */
-}
+
 
 .beans {
   margin-top: 1000;
 }
 
+.mainEditor {
+  padding: 20px;
+}
 .editor-container {
-  max-width: 800px; /* Set a maximum width for the editor container */
-  margin: 20px auto; /* Center the container with top and bottom margin */
-  margin-top: 120px;
-  padding: 20px; /* Add padding to the container */
-  /* background-color: #fff; Set a white background color for the container */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow for depth */
+  /* max-width: 800px; Set a maximum width for the editor container */
+  /* margin: 20px auto; Center the container with top and bottom margin */
+  /* margin-top: 120px; */
+  padding: 20px; 
+  /* background-color: #000; */
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); Add a subtle box shadow for depth */
   border-radius: 5px; /* Add rounded corners to the container */
 }
 
-.barrr { 
-  margin: 20px auto;
-  padding: 20px; /* Add padding to the container */
-  margin-top: 20px;
-  margin-bottom: 20px;
-  margin-right: 10px;
-  margin-left: 10px; 
-  margin: 20px auto;
-}
 
-.navbar2 {
-  margin-top: 50px !important;
-  justify-content: center !important; 
-  align-items: center !important;
-}
-.nav {
-  justify-content: center !important; 
-  align-items: center !important;
-}
+
 .padded-margins {
   /* margin-top: 10px;
   margin-bottom: 10px;
@@ -119,7 +100,7 @@ main textarea {
   padding: 5px;
 }
 
-#toolbar {
+/* #toolbar {
   display: flex;
   justify-content: center !important; 
   align-items: center !important;
@@ -130,13 +111,81 @@ main textarea {
   justify-content: center !important; 
   align-items: center !important;
   width: 100%;
+} */
+.ql-formats{
+  color: #ffffff !important;
 }
 .ql-toolbar.ql-snow {
-  max-width: 100%; /* Use max-width instead of width to allow the toolbar to shrink if needed */
-  margin: auto; /* Center the toolbar */
+  /* max-width: 100%; 
+  margin: auto; 
   display: flex;
   justify-content: center !important; 
   align-items: center !important;
+  width: 100%; */
+  background-color: #000 !important;
+  /* outline: none !important; */
+}
+
+
+.ql-toolbar .ql-stroke {
+  fill: none;
+  stroke: #fff;
+}
+.ql-toolbar {
+  border: none !important;
+}
+.ql-toolbar .ql-fill {
+  fill: #fff;
+  stroke: none;
+}
+
+.ql-toolbar .ql-picker {
+  color: #fff;
+}
+
+.ql-fill {
+  fill: #fff;
+  stroke: none;
+}
+
+.ql-container.ql-snow{ background-color: #000;}
+
+p {
+  color: #fff;
+  padding: 10px;
+  margin-top: 0px;
+  /* text-align: center; */
+}
+
+x-menubar {
+  /* margin-left: 10px; */
+  /* margin-right: 10px; */
+  position: fixed !important;
+  background-color: #000 !important;
+  z-index: 999 !important;
+  margin-bottom: 30px;
+  height: 40px;
+}
+
+x-card {
+    text-align: center;
+}
+
+x-button {
+  margin-left: 10px !important;
+}
+
+.black-bar {
   width: 100%;
+  height: 80px;
+  background-color: #000;
+  z-index: 999 !important;
+  position: fixed;
+}
+
+.top-space {
+  height: 40px; 
+  background-color: black;
+  z-index: 999 !important;
 }
 

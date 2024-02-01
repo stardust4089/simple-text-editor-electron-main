@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <link rel="stylesheet" href="mathquill/mathquill.css">
   <meta charset="UTF-8" />
@@ -34,155 +35,180 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
+    integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+  <title>FusionNotes</title>
 
-  <title>SlashNotes</title>
+
+  <script src="node_modules/xel/xel.js" type="module"></script>
+  <!-- <meta name="xel-theme" content="node_modules/xel/themes/fluent-dark.css"> -->
+  <meta name="xel-theme" content="node_modules/xel/themes/fluent-dark.css">
+  <meta name="xel-accent-color" content="purple">
+  <meta name="xel-iconsets" content="node_modules/xel/iconsets/material.svg">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
+  <div class=" black-bar">
+    <div class="top-space"></div>
+    <x-menubar>
+      <x-button id="createDocumentBtn">
+        <span class="material-icons"> note_add </span>
+        <x-label>New</x-label>
+      </x-button>
 
-  <body>
-    <!-- <h1>FusionNotes</h1> -->
-    
-    <nav class="navbar navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <h4 class="padded-margins document-name" id="documentName">no file selected</h4>
+      <x-button id="openDocumentBtn">
+        <span class="material-icons"> file_open </span>
+        <x-label>Open</x-label>
+      </x-button>
 
-        </div>
+      <x-button id="exportDocumentBtn">
+        <span class="material-icons"> ios_share </span>
+        <x-label>Export</x-label>
+      </x-button>
 
-        <ul class="nav navbar-nav navbar-right">
-          <div class="padded-margins">
-            <button id="createDocumentBtn">
-              <span class="padded-margins material-icons"> note_add </span>
-            </button>
-            <button id="openDocumentBtn">
-              <span class="padded-margins material-icons"> file_open </span>
-            </button>
-            <button id="saveDocumentBtn">
-              <span class="padded-margins material-icons"> save </span>
-            </button>
-            <button id="exportDocumentBtn">
-              <span class="padded-margins material-icons"> ios_share </span>
-            </button>
-            <button id="printDocumentBtn">
-              <span class="padded-margins material-icons"> print </span>
-            </button>
-          </div>
-        </ul>
-    </nav>
-    <div id="mainEditor"> 
-    <!-- Fixed navbar -->
-    <nav class="navbar2 navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header"></div>
-        <div class="d-flex justify-content-center align-items-center">
-          <ul class="nav navbar-nav">
-            <div id="toolbar" class="ql-toolbar ql-snow">
-              <span class="ql-formats">
-                <select class="ql-size">
-                  <option value="small"></option>
-                  <!-- Note a missing, thus falsy value, is used to reset to default -->
-                  <option selected></option>
-                  <option value="large"></option>
-                  <option value="huge"></option>
-                </select>
-                <select class="ql-font" style="display: none;">
-                  <option selected="selected"></option>
-                  <option value="serif"></option>
-                  <option value="monospace"></option>
-                </select>
-              </span>
+      <x-button id="printDocumentBtn">
+        <span class=" material-icons"> print </span>
+        <x-label>Print</x-label>
+      </x-button>
+      <x-menuitem>
+        <h4 class="padded-margins document-name" id="documentName">no file selected</h4>
+      </x-menuitem>
+    </x-menubar>
+    <div class="top-space"></div>
+    <x-menubar id="toolbar">
+      <span class="ql-formats">
 
-              <span class="ql-formats">
-                <button class="ql-bold" type="button"></button>
-                <button class="ql-italic" type="button"></button>
-                <button class="ql-underline" type="button"></button>
-                <button class="ql-strike" type="button"></button>
-              </span>
+        <select class="ql-size">
+          <option value="small"></option>
+          <!-- Note a missing, thus falsy value, is used to reset to default -->
+          <option selected></option>
+          <option value="large"></option>
+          <option value="huge"></option>
+        </select>
 
-              <span class="ql-formats">
-                <button class="ql-script" value="sub" type="button"></button>
-                <button class="ql-script" value="super" type="button"></button>
-              </span>
-              <span class="ql-formats">
-                <select class="ql-color" style="display: none;">
-                </select>
-                <select class="ql-background" style="display: none;">
-                </select>
-              </span>
-              <span class="ql-formats">
-                <button class="ql-header" value="1" type="button"></button>
-                <button class="ql-header" value="2" type="button"></button>
-                <button class="ql-blockquote" type="button"></button>
-                <button class="ql-code-block" type="button"></button>
-              </span>
-              <span class="ql-formats">
-                <button class="ql-list" value="ordered" type="button"></button>
-                <button class="ql-list" value="bullet" type="button"></button>
-                <button class="ql-indent" value="-1" type="button"></button>
-                <button class="ql-indent" value="+1" type="button"></button>
-              </span>
-              <span class="ql-formats">
-                <button class="ql-direction" value="rtl" type="button"></button>
-                <span class="ql-align ql-picker ql-icon-picker">
-                  <option selected="selected"></option>
-                  <option value="center"></option>
-                  <option value="right"></option>
-                  <option value="justify"></option>
-                  </select>
-                </span>
-                <span class="ql-formats">
-                  <button class="ql-link" type="button"></button>
-                  <button class="ql-image" type="button"></button>
-                  <button class="ql-video" type="button"></button>
-                  <button class="ql-formula" type="button"></button>
-                </span>
-                <span class="ql-formats">
-                  <button class="ql-clean" type="button"></button>
-                </span>
-            </div>
-        </div>
-        </ul>
-      </div>
-      </div>
-    </nav>
+        <select class="ql-font" style="display: none;">
+          <option selected="selected"></option>
+          <option value="serif"></option>
+          <option value="monospace"></option>
+        </select>
+      </span>
 
+      <span class="ql-formats">
+        <button class="ql-bold" type="button"></button>
+        <button class="ql-italic" type="button"></button>
+        <button class="ql-underline" type="button"></button>
+        <button class="ql-strike" type="button"></button>
+      </span>
 
-    <div id="main-container" class="beans container">      
+      <span class="ql-formats">
+        <button class="ql-script" value="sub" type="button"></button>
+        <button class="ql-script" value="super" type="button"></button>
+      </span>
 
-      <div class="editor-container">
-        <div id="editor"></div>
-      </div>
-      
-      <div hidden><textarea id="delta-output" display="none" type="textarea"></textarea></div>
-      <div hidden><textarea id="delta-input" display="none" type="textarea"></textarea></div>
+      <span class="ql-formats">
+        <select class="ql-color" style="display: none;">
+        </select>
+        <select class="ql-background" style="display: none;">
+        </select>
+      </span>
+
+      <span class="ql-formats">
+        <button class="ql-header" value="1" type="button"></button>
+        <button class="ql-header" value="2" type="button"></button>
+        <button class="ql-blockquote" type="button"></button>
+        <button class="ql-code-block" type="button"></button>
+      </span>
+
+      <span class="ql-formats">
+        <button class="ql-list" value="ordered" type="button"></button>
+        <button class="ql-list" value="bullet" type="button"></button>
+        <button class="ql-indent" value="-1" type="button"></button>
+        <button class="ql-indent" value="+1" type="button"></button>
+      </span>
+
+      <span class="ql-formats">
+        <button class="ql-direction" value="rtl" type="button"></button>
+        <span class="ql-align ql-picker ql-icon-picker">
+          <option selected="selected"></option>
+          <option value="center"></option>
+          <option value="right"></option>
+          <option value="justify"></option>
+          </select>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-link" type="button"></button>
+          <button class="ql-image" type="button"></button>
+          <button class="ql-video" type="button"></button>
+          <button class="ql-formula" type="button"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-clean" type="button"></button>
+        </span>
+    </x-menubar>
+  </div>
+
+  <!-- Fixed navbar -->
+  <!-- <nav class="">
+        <div class="container">
+          <div class="navbar-header"></div>
+          <div class="d-flex justify-content-center align-items-center">
+            <ul class="nav navbar-nav">
+              
+          </ul>
+        </div> -->
+  </div>
+  </nav>
+
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <div id="main-container" class="">
+
+    <div class="editor-container">
+      <div id="editor"></div>
     </div>
 
-    </div> <!-- /container -->
+    <div hidden><textarea id="delta-output" display="none" type="textarea"></textarea></div>
+    <div hidden><textarea id="delta-input" display="none" type="textarea"></textarea></div>
+  </div>
+
+  </div> <!-- /container -->
 
 
 
 
   </div>
-  </body>
+</body>
+
+<main id="demo-container" class="demo-container">
 
 
-  <main id="demo-container" class="demo-container">
-    <h1 id="load_files_text">
-      <br><br><br><br>
-      
-      
-      
-      Load A File To Begin Editing</h1>
-      <div id="recentFiles"></div>
-  </main>
+  <h1 id="load_files_text">
+    Load A File To Begin Editing
+  </h1>
 
+  <div class="pure-g">
+    <div class="pure-u-1-4">
+      <p></p>
+    </div>
+    <div id="recentFiles" class="d-flex pure-u-1-2"></div>
+    <div class="pure-u-1-4">
+      <p></p>
+    </div>
   </div>
+
+</main>
+
+</div>
 
 </body>
-<script>  
-var toolbarOptions = [
+<script>
+  var toolbarOptions = [
     ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
     ['formula'],
     ['blockquote', 'code-block'],
