@@ -25,8 +25,10 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
     autosave()
-    setInterval(autosave, 1000);
-
+    outputText.addEventListener("change", ()=> {
+      autosave();
+    });
+    
     document.getElementById("openDocumentBtn").addEventListener("click", () => {
       autosave();
       ipcRenderer.send("load-delta");
@@ -54,7 +56,6 @@ window.addEventListener('DOMContentLoaded', () => {
     el.createDocumentBtn.addEventListener("click", () => {
       ipcRenderer.send("create-document-triggered");
     });
-
 
 
   function loadEditor(){
