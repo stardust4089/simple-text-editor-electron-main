@@ -1,6 +1,8 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { Console } = require('console');
+const { send } = require('process');
 
 
 const isDevEnv = process.env.NODE_ENV === 'development';
@@ -36,7 +38,7 @@ const createWindow = () => {
     // SpellCheckHandler.attachTo(webContents);
   mainWindow.loadFile('index.html');
   const { Menu, MenuItem } = require('electron')
-
+  sendRecentFiles();
   mainWindow.webContents.on('context-menu', (event, params) => {
     const menu = new Menu()
   
@@ -114,9 +116,23 @@ const createWindow = () => {
   
 };
 
-app.whenReady().then(createWindow);
+app.whenReady().then(()=>{
+  createWindow();
+  sendRecentFiles();
+});
 
-
+const sendRecentFiles = () => {
+  console.log("sendRecentFiles");
+  const recentFilesPath = path.join(app.getPath('userData'), 'recentFiles.json');
+  console.log(recentFilesPath);
+  fs.readFile(recentFilesPath, (error, data) => {
+    if (error) {
+      console.error('Error reading recent files:', error);
+    } else {
+      mainWindow.webContents.send("recent-files", JSON.parse(data));
+    }
+  });
+};
 
 // IPC handlers for your renderer process events
 ipcMain.on('text-change', function(delta, oldDelta, source) {
@@ -128,6 +144,9 @@ ipcMain.on('text-change', function(delta, oldDelta, source) {
   }
 });
 
+ipcMain.on('loaded-page', ()=> {
+  sendRecentFiles();
+});
 
 const openFile = (filePath) => {
   fs.readFile(filePath, "utf8", (error, content) => {
@@ -139,18 +158,69 @@ const openFile = (filePath) => {
       mainWindow.webContents.send("document-opened", { filePath, content });
     }
   });
+  
 };
+
+const addNewRecentDocument = (filePath) => {
+  const recentFilesPath = path.join(app.getPath('userData'), 'recentFiles.json');
+  fs.readFile(recentFilesPath, (error, data) => {
+    let recentFiles;
+    if (error) {
+      recentFiles = [];
+    } else {
+      recentFiles = JSON.parse(data);
+    }
+
+    // Check if the file is already in the list
+    if (!recentFiles.includes(filePath)) {
+      // If not, add it to the list
+      recentFiles.push(filePath);
+      fs.writeFile(recentFilesPath, JSON.stringify(recentFiles), (error) => {
+        if (error) {
+          console.error('Error storing recent files:', error);
+        }
+      });
+    }
+  });
+};
+
+ipcMain.on("add-new-recent-document", (event, filePath) => {
+addNewRecentDocument(filePath);
+});
+
 
 ipcMain.on("open-document-triggered", () => {
   dialog
     .showOpenDialog({
       properties: ["openFile"],
-      filters: [{ name: "text files", extensions: ["txt"] }],
+      filters: [{ name: "delta files", extensions: ["delta"] }],
     })
     .then(({ filePaths }) => {
       const filePath = filePaths[0];
 
       openFile(filePath);
+      addNewRecentDocument(filePath);
+      sendRecentFiles();
+    });
+});
+
+ipcMain.on("create-document-triggered", () => {
+  dialog
+    .showSaveDialog(mainWindow, {
+      filters: [{ name: "delta files", extensions: ["delta"] }],
+    })
+    .then(({ filePath }) => {
+      fs.writeFile(filePath, "", (error) => {
+        if (error) {
+          handleError();
+        } else {
+          app.addRecentDocument(filePath);
+          openedFilePath = filePath;
+          mainWindow.webContents.send("document-created", filePath);
+          addNewRecentDocument(filePath);
+          sendRecentFiles();
+        }
+      });
     });
 });
 
@@ -164,25 +234,6 @@ ipcMain.on("save-document", (_, textareaContent) => {
       handleError();
     }
   });
-});
-
-
-ipcMain.on("create-document-triggered", () => {
-  dialog
-    .showSaveDialog(mainWindow, {
-      filters: [{ name: "text files", extensions: ["txt"] }],
-    })
-    .then(({ filePath }) => {
-      fs.writeFile(filePath, "", (error) => {
-        if (error) {
-          handleError();
-        } else {
-          app.addRecentDocument(filePath);
-          openedFilePath = filePath;
-          mainWindow.webContents.send("document-created", filePath);
-        }
-      });
-    });
 });
 
 ipcMain.on("export-delta", (html) => {
@@ -200,6 +251,10 @@ ipcMain.on("export-delta", (html) => {
     });
 });
 
+// Handle loading of the second page
+ipcMain.on('load-editor-page', () => {
+  mainWindow.loadFile('index.html');  
+});
 
 function handleError(){
   console.log("cope harder")
