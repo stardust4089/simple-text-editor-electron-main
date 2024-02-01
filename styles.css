@@ -168,10 +168,16 @@ x-menubar {
 }
 
 x-card {
-    text-align: center;
+    /* text-align: center; */
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
 }
 
 x-button {
+  border: none !important;
+}
+
+.padded-x-button{
   margin-left: 10px !important;
 }
 

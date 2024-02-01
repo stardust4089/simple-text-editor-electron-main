@@ -51,25 +51,30 @@
 </head>
 
 <body>
-  <div class=" black-bar">
-    <div class="top-space"></div>
+  <div class="black-bar">
+    <x-tabs id="tabs-bar">
+      <x-button id="newTab">
+        <x-icon href="#add"></x-icon>
+      </x-button>
+    </x-tabs>
+    <!-- <div class="top-space"></div> -->
     <x-menubar>
-      <x-button id="createDocumentBtn">
+      <x-button class="padded-x-button" id="createDocumentBtn">
         <span class="material-icons"> note_add </span>
         <x-label>New</x-label>
       </x-button>
 
-      <x-button id="openDocumentBtn">
+      <x-button class="padded-x-button" id="openDocumentBtn">
         <span class="material-icons"> file_open </span>
         <x-label>Open</x-label>
       </x-button>
 
-      <x-button id="exportDocumentBtn">
+      <x-button class="padded-x-button" id="exportDocumentBtn">
         <span class="material-icons"> ios_share </span>
         <x-label>Export</x-label>
       </x-button>
 
-      <x-button id="printDocumentBtn">
+      <x-button class="padded-x-button" id="printDocumentBtn">
         <span class=" material-icons"> print </span>
         <x-label>Print</x-label>
       </x-button>
@@ -148,9 +153,7 @@
           <button class="ql-clean" type="button"></button>
         </span>
     </x-menubar>
-  </div>
-  </div>
-  </nav>
+  </div></div></nav>
 
   <br>
   <br>
@@ -235,6 +238,22 @@
           formulaButton.click();
         }
       });
+
+      function newQuillEditor(editorId) {
+        const enableMathQuillFormulaAuthoring = window.mathquill4quill();
+        const quill = new Quill("#"+editorId, quillOptions);
+        enableMathQuillFormulaAuthoring(quill);
+        quill.keyboard.addBinding({
+          key: 191
+        }, function (range, context) {
+          // Simulate a click event on the bold toolbar button
+          const formulaButton = document.querySelector('.ql-toolbar .ql-formula');
+          if (formulaButton) {
+            formulaButton.click();
+          }
+        });
+      }
+
       quill.disable();
       document.getElementById("editor").style.display = "none";
       document.getElementById("main-container").style.display = "none";
@@ -245,7 +264,10 @@
         document.getElementById("delta-output").value = JSON.stringify(quill.getContents());
         document.getElementById("delta-output").dispatchEvent(new Event('change'));
       });
-      function myFunction() {
+
+
+
+      function checkForFileOpened() {
         if (document.getElementById("delta-input").value != "") {
           quill.enable();
           document.getElementById("editor").style.display = "block";
@@ -256,12 +278,8 @@
           document.getElementById("delta-input").value = "";
         }
       }
-
-      // Call the function immediately
-      myFunction();
-
-      // Set up a timer to run the function every 10 seconds (10000 milliseconds)
-      setInterval(myFunction, 1);
+      checkForFileOpened();
+      setInterval(checkForFileOpened, 1);
     });
 
   })(window.jQuery, window.Quill);</script>

@@ -14,13 +14,16 @@ window.addEventListener('DOMContentLoaded', () => {
   const inputText = document.getElementById("delta-input");
 
   var _filepath = "";
-
+  var currentTabs= [];
+  var numtabs = 0;
   const el = {
     documentName: document.getElementById("documentName"),
     createDocumentBtn: document.getElementById("createDocumentBtn"),
     openDocumentBtn: document.getElementById("openDocumentBtn"),
     exportDocumentBtn: document.getElementById("exportDocumentBtn"),
     printDocumentBtn: document.getElementById("printDocumentBtn"),
+    newTabBtn: document.getElementById("newTab"),
+    tabsBar: document.getElementById("tabs-bar"),
     // saveDocumentBtn: document.getElementById("saveDocumentBtn"),
   };
 
@@ -28,7 +31,7 @@ window.addEventListener('DOMContentLoaded', () => {
     outputText.addEventListener("change", ()=> {
       autosave();
     });
-    
+
     document.getElementById("openDocumentBtn").addEventListener("click", () => {
       autosave();
       ipcRenderer.send("load-delta");
@@ -37,6 +40,10 @@ window.addEventListener('DOMContentLoaded', () => {
     el.printDocumentBtn.addEventListener("click", () => {
       autosave();
       print();
+    });
+
+    el.newTabBtn.addEventListener("click", () => {
+      ipcRenderer.send("create-document-triggered");
     });
 
     // el.saveDocumentBtn.addEventListener("click", () => {
@@ -57,10 +64,17 @@ window.addEventListener('DOMContentLoaded', () => {
       ipcRenderer.send("create-document-triggered");
     });
 
-
-  function loadEditor(){
-    ipcRenderer.send("load-editor-page");
-    onIndexLoad();
+  function newTab(file_path){
+    currentTabs.push(file_path);
+    numtabs++;
+    let tab = document.createElement('x-tab');
+    tab.textContent = path.parse(file_path).base;
+    tab.addEventListener('click', () => {
+      ipcRenderer.send("open-tab-document", file_path);
+      handleDocumentChange(file_path);
+    });
+    el.tabsBar.appendChild(tab);
+    tab.click();
   }
 
 
@@ -102,8 +116,9 @@ window.addEventListener('DOMContentLoaded', () => {
       fileElement.addEventListener('click', () => {
         _filepath = file;
         ipcRenderer.send("opened-recent-document", file);
-        handleDocumentChange(file);
         ipcRenderer.send("add-new-recent-document", file);
+        handleDocumentChange(file);
+        newTab(file);
       });
       recentFilesElement.appendChild(fileElement);
     });
@@ -134,10 +149,15 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   ipcRenderer.on("document-opened", (_, { filePath, content }) => {
+    if (_filepath == filePath){
+      return;
+    }
     _filepath = filePath;
     // loadEditor();
     handleDocumentChange(filePath, content);
     autosave();
+    if (!currentTabs.includes(filePath)){
+      newTab(filePath);}
   });
 
   ipcRenderer.on("document-created", (_, filePath) => {
@@ -145,6 +165,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // loadEditor();
     handleDocumentChange(filePath);
     autosave();
+    if (!currentTabs.includes(filePath)){
+      newTab(filePath);}
   });
 
   ipcRenderer.on("save", () => {

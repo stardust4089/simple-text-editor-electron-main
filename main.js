@@ -122,14 +122,35 @@ app.whenReady().then(()=>{
 });
 
 const sendRecentFiles = () => {
-  console.log("sendRecentFiles");
   const recentFilesPath = path.join(app.getPath('userData'), 'recentFiles.json');
-  console.log(recentFilesPath);
   fs.readFile(recentFilesPath, (error, data) => {
     if (error) {
       console.error('Error reading recent files:', error);
     } else {
-      mainWindow.webContents.send("recent-files", JSON.parse(data));
+      let recentFiles = JSON.parse(data);
+
+      // Get the modification date of each file
+      Promise.all(recentFiles.map(file => {
+        return new Promise((resolve, reject) => {
+          fs.stat(file, (error, stats) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve({ path: file, dateModified: stats.mtime });
+            }
+          });
+        });
+      }))
+      .then(files => {
+        // Sort the files by date modified
+        files.sort((a, b) => b.dateModified - a.dateModified);
+
+        // Send the sorted list of files to the renderer process
+        mainWindow.webContents.send('recent-files', files.map(file => file.path));
+      })
+      .catch(error => {
+        console.error('Error getting file stats:', error);
+      });
     }
   });
 };
@@ -208,6 +229,10 @@ ipcMain.on("opened-recent-document", (_, filePath) => {
   openFile(filePath);
 });
 
+ipcMain.on("open-tab-document", (_, filePath) => {
+  openFile(filePath);
+});
+
 ipcMain.on("create-document-triggered", () => {
   dialog
     .showSaveDialog(mainWindow, {
@@ -230,6 +255,17 @@ ipcMain.on("create-document-triggered", () => {
 
 app.on('before-quit', () => {
   mainWindow.webContents.send('save');
+});
+
+app.on('ready', () => {
+  // Register this app as the default handler for .delta files
+  app.setAsDefaultProtocolClient('delta');
+});
+
+app.on('open-url', (event, url) => {
+  app.addRecentDocument(url);
+  openedFilePath = url;
+  openFile(url);
 });
 
 ipcMain.on("save-document", (_, textareaContent) => {
