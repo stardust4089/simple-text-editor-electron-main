@@ -4,41 +4,39 @@ const { pdfExporter } = require('quill-to-pdf');
 var FileSaver = require('file-saver');
 var QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtmlConverter;
 const pdf = require('html-pdf'); // Import the html-pdf module
+const { error } = require("console");
+var outputText;
+var inputText;
+var filepath = "";
+const maximumRecentFiles = 10;
 
 window.addEventListener('DOMContentLoaded', () => {
+
   const outputText = document.getElementById("delta-output");
   const inputText = document.getElementById("delta-input");
 
   var _filepath = "";
-
+  var currentTabs = new Set();
+  var numtabs = 0;
   const el = {
     documentName: document.getElementById("documentName"),
     createDocumentBtn: document.getElementById("createDocumentBtn"),
     openDocumentBtn: document.getElementById("openDocumentBtn"),
     exportDocumentBtn: document.getElementById("exportDocumentBtn"),
     printDocumentBtn: document.getElementById("printDocumentBtn"),
-    saveDocumentBtn: document.getElementById("saveDocumentBtn"),
+    newTabBtn: document.getElementById("newTab"),
+    tabsBar: document.getElementById("tabs-bar"),
+    closeTabBtn: document.getElementById("closeTabBtn"),
+    editor: document.getElementById("editor"),
+    mainContainer: document.getElementById("main-container"),
+    loadContainer: document.getElementById("load-container"),
   };
 
-  const handleDocumentChange = (filePath, content = "") => {
-    el.documentName.innerHTML = path.parse(filePath).base;
-    _filePath = filePath;
-    inputText.value = content;
-    if (content == "") {
-      inputText.value = JSON.stringify([{ insert: 'Notes: ' }]);
-    }
-  };
-
-  function autosave() {
-    console.log("path" + _filepath)
-    if (_filepath == "") return;
-    console.log("autosaving");
-    ipcRenderer.send("save-document", outputText.value);
-    el.documentName.innerHTML = path.parse(_filePath).base + " (saved at " + new Date().toLocaleTimeString() + ")";
-  }
-
-  autosave()
-  setInterval(autosave, 1000);
+  autosave();
+  
+  outputText.addEventListener("change", () => {
+    autosave();
+  });
 
   document.getElementById("openDocumentBtn").addEventListener("click", () => {
     autosave();
@@ -50,51 +48,159 @@ window.addEventListener('DOMContentLoaded', () => {
     print();
   });
 
-  el.saveDocumentBtn.addEventListener("click", () => {
-    autosave();
+  el.newTabBtn.addEventListener("click", () => {
+    ipcRenderer.send("create-document-triggered");
+  });
+
+  el.closeTabBtn.addEventListener("click", () => {
+    closeTab(_filepath);
   });
 
   el.exportDocumentBtn.addEventListener("click", () => {
     autosave();
     exportAsPDF();
   });
+
+  el.openDocumentBtn.addEventListener("click", () => {
+    autosave();
+    ipcRenderer.send("open-document-triggered");
+  });
+
+  el.createDocumentBtn.addEventListener("click", () => {
+    ipcRenderer.send("create-document-triggered");
+  });
+
+  function newTab(file_path) {
+    currentTabs.add(file_path);
+    numtabs++;
+    let tab = document.createElement('x-tab');
+    tab.textContent = path.parse(file_path).base;
+
+    tab.addEventListener('click', () => {
+      ipcRenderer.send("open-tab-document", file_path);
+    });
+
+    tab.id = file_path;
+    el.tabsBar.prepend(tab);
+    tab.click();
+  }
+
+  function closeTab(file_path) {
+    currentTabs.delete(file_path);
+    autosave();
+    numtabs--;
+    el.tabsBar.removeChild(document.getElementById(file_path));
+    if (numtabs == 0) {
+      openLoadWindow();
+    } else {
+      el.tabsBar.firstChild.click();
+    }
+  }
+
+  function openLoadWindow() {
+    setFilePathGlobal("no file selected")
+    el.editor.style.display = "none";
+    el.mainContainer.style.display = "none";
+    document.getElementsByClassName("ql-toolbar")[0].style.display = "none";
+    el.loadContainer.style.display = "block";
+  }
+
+  function closeLoadWindow() {
+    el.editor.style.display = "block";
+    el.mainContainer.style.display = "block";
+    document.getElementsByClassName("ql-toolbar")[0].style.display = "block";
+    el.loadContainer.style.display = "none";
+  }
+
+  function setFilePathGlobal(file_path) {
+    try {
+      el.documentName.innerHTML = path.parse(file_path).base;
+    }
+    catch(error){
+      el.documentName.innerHTML = file_path;
+    }
+    _filepath = file_path;
+  }
+
+  const handleDocumentChange = (filePath, content = "") => {
+    el.documentName.innerHTML = path.parse(filePath).base;
+    _filePath = filePath;
+    inputText.value = content;
+    if (content == "") {
+      inputText.value = JSON.stringify([{ insert: 'Notes: ' }]);
+    }
+  };
+
+  const { ipcRenderer } = require('electron');
+  ipcRenderer.send('loaded-page');
+
+
+
+  ipcRenderer.on("recent-files", (event, recentFiles) => {
+    let recentFilesElement = document.getElementById('recentFiles');
+    // Clear the current list
+    while (recentFilesElement.firstChild) {
+      recentFilesElement.removeChild(recentFilesElement.firstChild);
+    }
+    var interations = 0;
+    // Add the recent files to the list
+    recentFiles.forEach(file => {
+      if (interations >= maximumRecentFiles) { return; }
+      interations++;
+      let fileElement = document.createElement('x-card');
+      let textElement = document.createElement('p');
+      textElement.textContent = file;
+      fileElement.appendChild(textElement);
+      fileElement.addEventListener('click', () => {
+        newTab(file);
+        ipcRenderer.send("open-tab-document", file);
+        ipcRenderer.send("add-new-recent-document", file);
+      });
+      recentFilesElement.appendChild(fileElement);
+    });
+  });
+
+  function autosave() {
+    if (_filepath == "" || _filepath == null) {
+      return;
+    }
+    ipcRenderer.send("save-document", outputText.value);
+    el.documentName.innerHTML = path.parse(_filepath).base + " (saved at " + new Date().toLocaleTimeString() + ")";
+  }
+
+
   function exportAsPDF() {
-    // var deltaOps = [
-    //   { "insert": "Notes: \nDefinition of a limi:\nLet " }, { "insert": { "formula": "f\\left(x\\right)" } }, { "insert": "  be a function defined near the fixed number " }, { "insert": { "formula": "a" } }, { "insert": " . Then the limit of " }, { "insert": { "formula": "f\\left(x\\right)" } }, { "insert": " as " }, { "insert": { "formula": "a" } }, { "insert": " approaches " }, { "insert": { "formula": "x" } }, { "insert": " written " }, { "insert": { "formula": "\\lim_{x->a}f\\left(x\\right)" } }, { "insert": ", equals number " }, { "insert": { "formula": "L" } }, { "insert": "  if the values of " }, { "insert": { "formula": "f\\left(x\\right)" } }, { "insert": "  can be made arbitrarily close to " }, { "insert": { "formula": "L" } }, { "insert": "  by having X be sufficiently close to " }, { "insert": { "formula": "a" } }, { "insert": ", but not equal to " }, { "insert": { "formula": "a" } }, { "insert": ".\n\nExample:\nSuppose a car's given position function in meters is given by " }, { "insert": { "formula": "s\\left(t\\right)\\ =\\ t^2" } }, { "insert": " for " }, { "insert": { "formula": "0\\ \\le t\\le3" } }, { "insert": ". Find the instantaneous velocity at " }, { "insert": { "formula": "t+2" } }, { "insert": " seconds (" }, { "insert": { "formula": "t=2" } }, { "insert": ")." }, { "attributes": { "list": "bullet" }, "insert": "\n" }, { "insert": "Given:" }, { "attributes": { "indent": 1, "list": "bullet" }, "insert": "\n" }, { "insert": { "formula": "s\\left(t\\right)=t^2" } }, { "insert": " at our position" }, { "attributes": { "indent": 2, "list": "bullet" }, "insert": "\n" }, { "insert": "Wanted:" }, { "attributes": { "indent": 1, "list": "bullet" }, "insert": "\n" }, { "insert": "Velocity at " }, { "insert": { "formula": "t=2" } }, { "insert": " " }, { "attributes": { "indent": 2, "list": "bullet" }, "insert": "\n" }, { "insert": "Slope of the tangent line, so the average velocity " }, { "attributes": { "underline": true }, "insert": "near" }, { "insert": " " }, { "insert": { "formula": "t=2" } }, { "insert": " " }, { "attributes": { "indent": 2, "list": "bullet" }, "insert": "\n" }, { "insert": "Expression for avg. velocity on " }, { "insert": { "formula": "\\left[x,2\\right]" } }, { "insert": " " }, { "attributes": { "indent": 1, "list": "bullet" }, "insert": "\n" }, { "insert": { "formula": "m_{\\sec\\ }=\\ \\frac{rise}{run}" } }, { "insert": " " }, { "attributes": { "indent": 2, "list": "bullet" }, "insert": "\n" }, { "insert": { "formula": "\\frac{s\\left(2\\right)-s\\left(s\\right)}{2-x}" } }, { "insert": " " }, { "attributes": { "indent": 2, "list": "bullet" }, "insert": "\n" }, { "insert": { "formula": "\\frac{4-x^2}{2-x}" } }, { "insert": " " }, { "attributes": { "indent": 2, "list": "bullet" }, "insert": "\n" }, { "insert": "Limit:" }, { "attributes": { "indent": 1, "list": "bullet" }, "insert": "\n" }, { "insert": { "formula": "\\lim_{x->2}\\left(\\frac{4-x^2}{2-x}\\right)" } }, { "insert": " " }, { "attributes": { "indent": 2, "list": "bullet" }, "insert": "\n" }, { "insert": "Approaches 4 as " }, { "insert": { "formula": "x" } }, { "insert": " approaches 2" }, { "attributes": { "indent": 2, "list": "bullet" }, "insert": "\n" }, { "insert": "Key fact:" }, { "attributes": { "list": "bullet" }, "insert": "\n" }, { "insert": "When you calculate a limit, if written standard, it is a TWO SIDED LIMT" }, { "attributes": { "indent": 1, "list": "bullet" }, "insert": "\n" }, { "insert": "So it only exists if the both go to the same value. " }, { "attributes": { "indent": 2, "list": "bullet" }, "insert": "\n" }
-    // ];
     var deltaOps = JSON.parse(outputText.value.slice(7, -1));
     var cfg = {};
 
     var converter = new QuillDeltaToHtmlConverter(deltaOps, cfg);
 
     var html = String("<!DOCTYPE html>" + converter.convert() + "<link rel=\"stylesheet\" href=\"https:\/\/cdn.jsdelivr.net/npm/katex@0.14.0/dist/katex.min.css\"><script src=\"https://cdn.jsdelivr.net/npm/katex@0.14.0/dist/katex.min.js\"></script><script>document.querySelectorAll('.ql-formula').forEach((element) => {katex.render(element.innerText, element, { displayMode: false });});</script>");
-    console.log(html);
     FileSaver.saveAs(new Blob([html], { type: "text/pdf;charset=utf-8" }), "export.html");
   }
 
-  // const exportAsPDF = async () => {
-  //   const pdfAsBlob = await pdfExporter.generatePdf(JSON.parse(outputText.value)); // converts to PDF
-  //   FileSaver.saveAs(pdfAsBlob, "pdf-export.pdf"); // downloads from the browser
-  // };
-  el.openDocumentBtn.addEventListener("click", () => {
-    autosave();
-    ipcRenderer.send("open-document-triggered");
-  });
-
   ipcRenderer.on("document-opened", (_, { filePath, content }) => {
+    autosave();
+    if (_filepath == filePath) {
+      return;
+    }
     _filepath = filePath;
     handleDocumentChange(filePath, content);
     autosave();
+    closeLoadWindow();
+    if (!currentTabs.has(filePath)) {
+      newTab(filePath);
+    }
   });
 
   ipcRenderer.on("document-created", (_, filePath) => {
+    closeLoadWindow();
     _filepath = filePath;
     handleDocumentChange(filePath);
     autosave();
-  });
-
-  el.createDocumentBtn.addEventListener("click", () => {
-    ipcRenderer.send("create-document-triggered");
+    if (!currentTabs.has(filePath)) {
+      newTab(filePath);
+    }
   });
 
   ipcRenderer.on("save", () => {

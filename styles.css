@@ -1,12 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
-  background-color: rgb(0, 0, 0);
+  /* background-color: rgb(0, 0, 0) !important; */
   margin: 0;
-  color: #fff;
+  /* color: #fff; */
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
-.ql-toolbar .ql-stroke {
+
+/* .title-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999; You can adjust the z-index as needed */
+  /* background-color: #fff; Add your desired background color */
+  /* Add any other styling you want for the title bar */
+/* } */
+/* .ql-toolbar .ql-stroke {
   fill: none;
   stroke: #fff;
 }
@@ -18,22 +32,20 @@ body {
 
 .ql-toolbar .ql-picker {
   color: #fff;
-}
+} */
 
 h1 {
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
-  color: #fff;
 }
-.title-bar {
+/* .title-bar {
   height: 50px;
   width: 100%;
-  background-color: rgb(140, 140, 140);
   -webkit-app-region: drag;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-}
+} */
 
 .title-bar .document-name,
 .title-bar .menu-section {
@@ -41,7 +53,6 @@ h1 {
 }
 
 .menu-section button {
-  background-color: rgb(255, 255, 255);
   border: none;
   outline: none;
 }
@@ -55,8 +66,140 @@ main textarea {
   width: 100%;
   height: 100%;
   background-color: transparent;
-  color: #fff;
   border: none;
   outline: none;
   resize: none;
+}
+
+
+
+.beans {
+  margin-top: 1000;
+}
+
+.mainEditor {
+  padding: 20px;
+}
+.editor-container {
+  /* max-width: 800px; Set a maximum width for the editor container */
+  /* margin: 20px auto; Center the container with top and bottom margin */
+  /* margin-top: 120px; */
+  padding: 20px; 
+  /* background-color: #000; */
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); Add a subtle box shadow for depth */
+  border-radius: 5px; /* Add rounded corners to the container */
+}
+
+
+
+.padded-margins {
+  /* margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  margin-right: 10px; */
+  padding: 5px;
+}
+
+/* #toolbar {
+  display: flex;
+  justify-content: center !important; 
+  align-items: center !important;
+  width: 100%;
+}
+.toolbar {
+  display: flex;
+  justify-content: center !important; 
+  align-items: center !important;
+  width: 100%;
+} */
+.ql-formats{
+  color: #ffffff !important;
+}
+.ql-toolbar.ql-snow {
+  /* max-width: 100%; 
+  margin: auto; 
+  display: flex;
+  justify-content: center !important; 
+  align-items: center !important;
+  width: 100%; */
+  background-color: #000 !important;
+  /* outline: none !important; */
+}
+
+
+.ql-toolbar .ql-stroke {
+  fill: none;
+  stroke: #fff;
+}
+.ql-toolbar {
+  border: none !important;
+}
+.ql-toolbar .ql-fill {
+  fill: #fff;
+  stroke: none;
+}
+
+.ql-toolbar .ql-picker {
+  color: #fff;
+}
+
+.ql-fill {
+  fill: #fff;
+  stroke: none;
+}
+
+.ql-container.ql-snow{ background-color: #000;}
+
+p {
+  color: #fff;
+  padding: 10px;
+  margin-top: 0px;
+  /* text-align: center; */
+}
+
+x-menubar {
+  /* margin-left: 10px; */
+  /* margin-right: 10px; */
+  position: fixed !important;
+  background-color: #000 !important;
+  z-index: 999 !important;
+  margin-bottom: 30px;
+  height: 40px;
+}
+
+x-card {
+    /* text-align: center; */
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+x-button {
+  border: none !important;
+}
+
+.padded-x-button{
+  margin-left: 10px !important;
+}
+
+.black-bar {
+  width: 100%;
+  height: 80px;
+  background-color: #000;
+  z-index: 999 !important;
+  position: fixed;
+}
+
+.top-space {
+  height: 40px; 
+  background-color: black;
+  z-index: 999 !important;
+}
+
+.red {
+  color: red;
+  fill: red;
+}
+
+h3 {
+  text-align: center;
 }

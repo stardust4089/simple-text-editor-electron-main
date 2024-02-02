@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-  <link rel="stylesheet" href="mathquill/mathquill.css">
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -34,43 +33,178 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
-  <title>SlashNotes</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
+    integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+  <title>FusionNotes</title>
+
+
+  <script src="node_modules/xel/xel.js" type="module"></script>
+  <!-- <meta name="xel-theme" content="node_modules/xel/themes/fluent-dark.css"> -->
+  <meta name="xel-theme" content="node_modules/xel/themes/fluent-dark.css">
+  <meta name="xel-accent-color" content="purple">
+  <meta name="xel-iconsets" content="node_modules/xel/iconsets/material.svg">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
-  <div class="title-bar">
-    <span class="document-name" id="documentName">no file selected</span>
-
-    <div class="menu-section">
-      <button id="createDocumentBtn">
+  <div class="black-bar">
+    <x-tabs id="tabs-bar">
+      <x-button id="newTab">
+        <x-icon href="#add"></x-icon>
+      </x-button>
+    </x-tabs>
+    <!-- <div class="top-space"></div> -->
+    <x-menubar>
+      <x-button class="padded-x-button" id="createDocumentBtn">
         <span class="material-icons"> note_add </span>
-      </button>
-      <button id="openDocumentBtn">
+        <x-label>New</x-label>
+      </x-button>
+
+      <x-button class="padded-x-button" id="openDocumentBtn">
         <span class="material-icons"> file_open </span>
-      </button>
-      <button id="saveDocumentBtn">
-        <span class="material-icons"> save </span>
-      </button>
-      <button id="exportDocumentBtn">
+        <x-label>Open</x-label>
+      </x-button>
+
+      <x-button class="padded-x-button" id="exportDocumentBtn">
         <span class="material-icons"> ios_share </span>
-      </button>
-      <button id="printDocumentBtn">
-        <span class="material-icons"> print </span>
-      </button>
+        <x-label>Export</x-label>
+      </x-button>
+
+      <x-button class="padded-x-button" id="printDocumentBtn">
+        <span class=" material-icons"> print </span>
+        <x-label>Print</x-label>
+      </x-button>
+
+      <x-button class="padded-x-button red" id="closeTabBtn">
+        <span class="material-icons"> close </span>
+        <x-label>Close this tab</x-label>
+      </x-button>
+
+      <x-menuitem>
+        <h4 class="padded-margins document-name" id="documentName">no file selected</h4>
+      </x-menuitem>
+    </x-menubar>
+    <div class="top-space"></div>
+    <x-menubar id="toolbar">
+      <span class="ql-formats">
+
+        <select class="ql-size">
+          <option value="small"></option>
+          <!-- Note a missing, thus falsy value, is used to reset to default -->
+          <option selected></option>
+          <option value="large"></option>
+          <option value="huge"></option>
+        </select>
+
+        <select class="ql-font" style="display: none;">
+          <option selected="selected"></option>
+          <option value="serif"></option>
+          <option value="monospace"></option>
+        </select>
+      </span>
+
+      <span class="ql-formats">
+        <button class="ql-bold" type="button"></button>
+        <button class="ql-italic" type="button"></button>
+        <button class="ql-underline" type="button"></button>
+        <button class="ql-strike" type="button"></button>
+      </span>
+
+      <span class="ql-formats">
+        <button class="ql-script" value="sub" type="button"></button>
+        <button class="ql-script" value="super" type="button"></button>
+      </span>
+
+      <span class="ql-formats">
+        <select class="ql-color" style="display: none;">
+        </select>
+        <select class="ql-background" style="display: none;">
+        </select>
+      </span>
+
+      <span class="ql-formats">
+        <button class="ql-header" value="1" type="button"></button>
+        <button class="ql-header" value="2" type="button"></button>
+        <button class="ql-blockquote" type="button"></button>
+        <button class="ql-code-block" type="button"></button>
+      </span>
+
+      <span class="ql-formats">
+        <button class="ql-list" value="ordered" type="button"></button>
+        <button class="ql-list" value="bullet" type="button"></button>
+        <button class="ql-indent" value="-1" type="button"></button>
+        <button class="ql-indent" value="+1" type="button"></button>
+      </span>
+
+      <span class="ql-formats">
+        <button class="ql-direction" value="rtl" type="button"></button>
+        <span class="ql-align ql-picker ql-icon-picker">
+          <option selected="selected"></option>
+          <option value="center"></option>
+          <option value="right"></option>
+          <option value="justify"></option>
+          </select>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-link" type="button"></button>
+          <button class="ql-image" type="button"></button>
+          <button class="ql-video" type="button"></button>
+          <button class="ql-formula" type="button"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-clean" type="button"></button>
+        </span>
+    </x-menubar>
+  </div></div></nav>
+
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <div id="main-container" class="">
+    <div class="editor-container">
+      <div id="editor"></div>
+    </div>
+    <div hidden><textarea id="delta-output" display="none" type="textarea"></textarea></div>
+    <div hidden><textarea id="delta-input" display="none" type="textarea"></textarea></div>
+  </div>
+
+  </div> <!-- /container -->
+
+
+
+
+  </div>
+</body>
+
+<main id="load-container">
+
+
+  <h1 id="load_files_text">
+    Load A File To Begin Editing
+  </h1>
+  <h3>Recent Files</h3>
+  <div class="pure-g">
+    <div class="pure-u-1-4">
+      <p></p>
+    </div>
+    
+    <div id="recentFiles" class="d-flex pure-u-1-2"><div></div></div>
+    <div class="pure-u-1-4">
+      <p></p>
     </div>
   </div>
 
-  <main class="demo-container">
-    <h1 id="load_files_text">Load A File To Begin Editing</h1>
-    <div id="editor"></div>
-    <div><textarea id="delta-output" display="none" type="textarea"></textarea></div>
-    <div><textarea id="delta-input" display="none" type="textarea"></textarea></div>
-  </main>
+</main>
 
-  </div>
+</div>
 
 </body>
-<script>  var toolbarOptions = [
+<script>
+  var toolbarOptions = [
     ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
     ['formula'],
     ['blockquote', 'code-block'],
@@ -90,7 +224,7 @@
       const quillOptions = {
         modules: {
           formula: true,
-          toolbar: toolbarOptions
+          toolbar: "#toolbar"
         },
         placeholder:
           "weasel rat <3",
@@ -109,30 +243,48 @@
           formulaButton.click();
         }
       });
-      quill.disable();
+
+      function newQuillEditor(editorId) {
+        const enableMathQuillFormulaAuthoring = window.mathquill4quill();
+        const quill = new Quill("#"+editorId, quillOptions);
+        enableMathQuillFormulaAuthoring(quill);
+        quill.keyboard.addBinding({
+          key: 191
+        }, function (range, context) {
+          // Simulate a click event on the bold toolbar button
+          const formulaButton = document.querySelector('.ql-toolbar .ql-formula');
+          if (formulaButton) {
+            formulaButton.click();
+          }
+        });
+      }
+
+      // quill.disable();
       document.getElementById("editor").style.display = "none";
+      document.getElementById("main-container").style.display = "none";
       document.getElementsByClassName("ql-toolbar")[0].style.display = "none";
-      document.getElementById("load_files_text").style.display = "block";
+      document.getElementById("load-container").style.display = "block";
 
       quill.on('text-change', function (delta, oldDelta, source) {
         document.getElementById("delta-output").value = JSON.stringify(quill.getContents());
+        document.getElementById("delta-output").dispatchEvent(new Event('change'));
       });
-      function myFunction() {
+
+
+
+      function checkForFileOpened() {
         if (document.getElementById("delta-input").value != "") {
-          quill.enable();
+          // quill.enable();
           document.getElementById("editor").style.display = "block";
+          document.getElementById("main-container").style.display = "block";
           document.getElementsByClassName("ql-toolbar")[0].style.display = "block";
-          document.getElementById("load_files_text").style.display = "none";
+          document.getElementById("load-container").style.display = "none";
           quill.setContents(JSON.parse(document.getElementById("delta-input").value));
           document.getElementById("delta-input").value = "";
         }
       }
-
-      // Call the function immediately
-      myFunction();
-
-      // Set up a timer to run the function every 10 seconds (10000 milliseconds)
-      setInterval(myFunction, 1);
+      checkForFileOpened();
+      setInterval(checkForFileOpened, 1);
     });
 
   })(window.jQuery, window.Quill);</script>
