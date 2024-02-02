@@ -1,16 +1,16 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { Console } = require('console');
+const { Console, clear } = require('console');
 const { send } = require('process');
 
 
-const isDevEnv = process.env.NODE_ENV === 'development';
-if (isDevEnv) {
-  try {
-    require('electron-reloader')(module);
-  } catch { }
-}
+// const isDevEnv = process.env.NODE_ENV === 'development';
+// if (isDevEnv) {
+//   try {
+//     require('electron-reloader')(module);
+//   } catch { }
+// }
 
 let mainWindow;
 let openedFilePath;
@@ -28,20 +28,20 @@ const createWindow = () => {
   });
 
 
-  if (isDevEnv) {
-    mainWindow.webContents.openDevTools();
-  }
-  mainWindow.webContents.openDevTools();
-    // // Attach context menu to the webContents
+  // if (isDevEnv) {
+  //   mainWindow.webContents.openDevTools();
+  // }
+  // mainWindow.webContents.openDevTools();
+  // // Attach context menu to the webContents
 
-    // // Set up the SpellCheckHandler
-    // SpellCheckHandler.attachTo(webContents);
+  // // Set up the SpellCheckHandler
+  // SpellCheckHandler.attachTo(webContents);
   mainWindow.loadFile('index.html');
   const { Menu, MenuItem } = require('electron')
   sendRecentFiles();
   mainWindow.webContents.on('context-menu', (event, params) => {
     const menu = new Menu()
-  
+
     // Add each spelling suggestion
     for (const suggestion of params.dictionarySuggestions) {
       menu.append(new MenuItem({
@@ -49,7 +49,7 @@ const createWindow = () => {
         click: () => mainWindow.webContents.replaceMisspelling(suggestion)
       }))
     }
-  
+
     // Allow users to add the misspelled word to the dictionary
     if (params.misspelledWord) {
       menu.append(
@@ -59,7 +59,7 @@ const createWindow = () => {
         })
       )
     }
-  
+
     menu.popup()
   })
   const menuTemplate = [
@@ -113,10 +113,10 @@ const createWindow = () => {
 
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
-  
+
 };
 
-app.whenReady().then(()=>{
+app.whenReady().then(() => {
   createWindow();
   sendRecentFiles();
 });
@@ -125,6 +125,7 @@ const sendRecentFiles = () => {
   const recentFilesPath = path.join(app.getPath('userData'), 'recentFiles.json');
   fs.readFile(recentFilesPath, (error, data) => {
     if (error) {
+      clearRecentFiles();
       console.error('Error reading recent files:', error);
     } else {
       let recentFiles = JSON.parse(data);
@@ -140,20 +141,31 @@ const sendRecentFiles = () => {
           });
         });
       }))
-      .then(files => {
-        // Sort the files by date modified
-        files.sort((a, b) => b.dateModified - a.dateModified);
-        // Send the sorted list of files to the renderer process
-        mainWindow.webContents.send('recent-files', files.map(file => file.path));
-      })
-      .catch(error => {
-        console.error('Error getting file stats:', error);
-      });
+        .then(files => {
+          // Sort the files by date modified
+          files.sort((a, b) => b.dateModified - a.dateModified);
+          // Send the sorted list of files to the renderer process
+          mainWindow.webContents.send('recent-files', files.map(file => file.path));
+        })
+        .catch(error => {
+          console.error('Error getting file stats:', error);
+        });
     }
   });
 };
 
-ipcMain.on('loaded-page', ()=> {
+ipcMain.on("clear-recent-files", () => {
+  const recentFilesPath = path.join(app.getPath('userData'), 'recentFiles.json');
+  fs.writeFile(recentFilesPath, "[]", (error) => {
+    if (error) {
+      console.error('Error clearing recent files:', error);
+    } else {
+      sendRecentFiles();
+    }
+  });
+});
+
+ipcMain.on('loaded-page', () => {
   sendRecentFiles();
 });
 
@@ -167,7 +179,7 @@ const openFile = (filePath) => {
       mainWindow.webContents.send("document-opened", { filePath, content });
     }
   });
-  
+
 };
 
 const addNewRecentDocument = (filePath) => {
@@ -194,7 +206,7 @@ const addNewRecentDocument = (filePath) => {
 };
 
 ipcMain.on("add-new-recent-document", (event, filePath) => {
-addNewRecentDocument(filePath);
+  addNewRecentDocument(filePath);
 });
 
 
@@ -259,9 +271,10 @@ app.on('open-url', (event, url) => {
 });
 
 ipcMain.on("save-document", (_, textareaContent) => {
-  if (openedFilePath == null) { 
+  if (openedFilePath == null) {
     console.error("filePath was null");
-    return; }
+    return;
+  }
   fs.writeFile(openedFilePath, textareaContent, (error) => {
     if (error) {
       handleError();
@@ -285,10 +298,10 @@ ipcMain.on("export-delta", (html) => {
 
 // Handle loading of the second page
 ipcMain.on('load-editor-page', () => {
-  mainWindow.loadFile('index.html');  
+  mainWindow.loadFile('index.html');
 });
 
-function handleError(){
+function handleError() {
   console.log("cope harder")
 }
 

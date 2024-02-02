@@ -30,12 +30,17 @@ window.addEventListener('DOMContentLoaded', () => {
     editor: document.getElementById("editor"),
     mainContainer: document.getElementById("main-container"),
     loadContainer: document.getElementById("load-container"),
+    clearRecentFiles: document.getElementById("clearRecentFiles"),
   };
 
   autosave();
-  
+
   outputText.addEventListener("change", () => {
     autosave();
+  });
+
+  el.clearRecentFiles.addEventListener("click", () => {
+    ipcRenderer.send("clear-recent-files");
   });
 
   document.getElementById("openDocumentBtn").addEventListener("click", () => {
@@ -74,7 +79,11 @@ window.addEventListener('DOMContentLoaded', () => {
     currentTabs.add(file_path);
     numtabs++;
     let tab = document.createElement('x-tab');
-    tab.textContent = path.parse(file_path).base;
+    let fileName = path.parse(file_path).base;
+    if (fileName.length > 10) {
+      fileName = fileName.substring(0, 7) + "...";
+    }
+    tab.textContent = fileName;
 
     tab.addEventListener('click', () => {
       ipcRenderer.send("open-tab-document", file_path);
@@ -116,7 +125,7 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       el.documentName.innerHTML = path.parse(file_path).base;
     }
-    catch(error){
+    catch (error) {
       el.documentName.innerHTML = file_path;
     }
     _filepath = file_path;
