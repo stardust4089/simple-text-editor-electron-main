@@ -31,7 +31,7 @@ const createWindow = () => {
   // if (isDevEnv) {
   //   mainWindow.webContents.openDevTools();
   // }
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
   // // Attach context menu to the webContents
 
   // // Set up the SpellCheckHandler

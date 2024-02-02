@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 body {
   /* background-color: rgb(0, 0, 0) !important; */
   margin: 0;
@@ -9,6 +5,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  font-family: Arial, sans-serif; 
 }
 
 /* .title-bar {
@@ -210,4 +207,23 @@ x-button {
 
 h3 {
   text-align: center;
+}
+#sidebar {
+  position: fixed;
+  right: 0;
+  top: 115px; /* Adjust this value to the height of your header bar */
+  bottom: 40px; /* Adjust this value to the height of your footer bar */
+  width: 0;
+  height: calc(100% - 115px); /* Subtract the height of the header bar from the height of the sidebar */
+  overflow: auto;
+  transition: width 0.5s;
+}
+
+#sidebar.open {
+  width: 400px;
+}
+
+#calculator {
+  width: 100%;
+  height: 100%;
 }

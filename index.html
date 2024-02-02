@@ -40,6 +40,10 @@
 
 
   <script src="node_modules/xel/xel.js" type="module"></script>
+
+  <!--Desmos-->
+  <script src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+
   <!-- <meta name="xel-theme" content="node_modules/xel/themes/fluent-dark.css"> -->
   <meta name="xel-theme" content="node_modules/xel/themes/fluent-dark.css">
   <meta name="xel-accent-color" content="purple">
@@ -81,6 +85,16 @@
         <span class="material-icons"> close </span>
         <x-label>Close this tab</x-label>
       </x-button>
+
+      <x-button class="padded-x-button" id="toggle-sidebar">
+        <span class="material-icons"> calculate </span>
+        <x-label>Calculator</x-label>
+      </x-button>
+
+      <x-button class="padded-x-button" id="insert-screenshot">
+        <x-icon href="#image"></x-icon>
+          <x-label>Insert Graph Capture</x-label></x-button>
+
 
       <x-menuitem>
         <h4 class="padded-margins document-name" id="documentName">no file selected</h4>
@@ -170,6 +184,10 @@
     <div class="editor-container">
       <div id="editor"></div>
     </div>
+
+    <div id="sidebar">
+      <div id="calculator"></div>
+    </div>
     <div hidden><textarea id="delta-output" display="none" type="textarea"></textarea></div>
     <div hidden><textarea id="delta-input" display="none" type="textarea"></textarea></div>
   </div>
@@ -218,6 +236,7 @@
 </body>
 <script>
 
+
   (function ($, Quill) {
     $(document).ready(() => {
       const quillOptions = {
@@ -232,7 +251,13 @@
 
       const enableMathQuillFormulaAuthoring = window.mathquill4quill();
       const quill = new Quill("#editor", quillOptions);
-      enableMathQuillFormulaAuthoring(quill);
+      var cursorPosition;
+      enableMathQuillFormulaAuthoring(quill, {
+        mathQuillConfig: {
+          autoSubscriptNumerals: true,
+          autoCommands: 'pi theta sqrt sum nthroot int vert',
+        }
+      });
       quill.keyboard.addBinding({
         key: 191
       }, function (range, context) {
@@ -284,6 +309,38 @@
       }
       checkForFileOpened();
       setInterval(checkForFileOpened, 1);
+
+      const calculator = Desmos.GraphingCalculator(document.getElementById('calculator'));
+
+      document.getElementById('toggle-sidebar').addEventListener('click', function () {
+        document.getElementById('sidebar').classList.toggle('open');
+      });
+      function getCursorPosition() {
+        if (quill.getSelection() != null){
+          cursorPosition = quill.getSelection().index;
+        }
+      }
+      setInterval(getCursorPosition, 1);
+      document.getElementById('insert-screenshot').addEventListener('click', function () {
+
+        // var fullsize = calculator.screenshot();
+        var thumbnail = calculator.screenshot({
+          width: 300,
+          height: 200,
+          targetPixelRatio: 1,
+          preserveAxisNumbers: true
+        });
+        quill.insertEmbed(cursorPosition, 'image', thumbnail);
+        // // Take a screenshot of the Desmos graph
+        // calculator.asyncScreenshot({ format: 'svg', width: 500, height: 500 }, function (data) {
+        //   // Get the current cursor position
+        //   const cursorPosition = quill.getSelection().index;
+
+        //   // Insert the screenshot at the cursor position
+        //   quill.insertEmbed(cursorPosition, 'image', data);
+        // });
+      });
+
     });
 
   })(window.jQuery, window.Quill);</script>
