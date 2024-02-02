@@ -195,3 +195,11 @@ x-button {
   z-index: 999 !important;
 }
 
+.red {
+  color: red;
+  fill: red;
+}
+
+h3 {
+  text-align: center;
+}

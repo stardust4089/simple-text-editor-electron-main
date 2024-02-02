@@ -128,7 +128,6 @@ const sendRecentFiles = () => {
       console.error('Error reading recent files:', error);
     } else {
       let recentFiles = JSON.parse(data);
-
       // Get the modification date of each file
       Promise.all(recentFiles.map(file => {
         return new Promise((resolve, reject) => {
@@ -144,7 +143,6 @@ const sendRecentFiles = () => {
       .then(files => {
         // Sort the files by date modified
         files.sort((a, b) => b.dateModified - a.dateModified);
-
         // Send the sorted list of files to the renderer process
         mainWindow.webContents.send('recent-files', files.map(file => file.path));
       })
@@ -154,16 +152,6 @@ const sendRecentFiles = () => {
     }
   });
 };
-
-// IPC handlers for your renderer process events
-ipcMain.on('text-change', function(delta, oldDelta, source) {
-  console.log("text-change");
-  if (source == 'api') {
-    console.log("An API call triggered this change.");
-  } else if (source == 'user') {
-    console.log("A user action triggered this change.");
-  }
-});
 
 ipcMain.on('loaded-page', ()=> {
   sendRecentFiles();
@@ -231,6 +219,8 @@ ipcMain.on("opened-recent-document", (_, filePath) => {
 
 ipcMain.on("open-tab-document", (_, filePath) => {
   openFile(filePath);
+  addNewRecentDocument(filePath);
+
 });
 
 ipcMain.on("create-document-triggered", () => {
@@ -280,7 +270,6 @@ ipcMain.on("save-document", (_, textareaContent) => {
 });
 
 ipcMain.on("export-delta", (html) => {
-  console.log("export-delta");
   dialog
     .showSaveDialog(mainWindow, {
       filters: [{ name: "html files", extensions: ["html"] }],
