@@ -71,7 +71,6 @@ window.addEventListener('DOMContentLoaded', () => {
     tab.textContent = path.parse(file_path).base;
     tab.addEventListener('click', () => {
       ipcRenderer.send("open-tab-document", file_path);
-      handleDocumentChange(file_path);
     });
     el.tabsBar.appendChild(tab);
     tab.click();
@@ -101,24 +100,12 @@ window.addEventListener('DOMContentLoaded', () => {
     // Add the recent files to the list
     recentFiles.forEach(file => {
       let fileElement = document.createElement('x-card');
-      // fileElement.textContent = file;
-      // fileElement.className = 'pure-button'; // Add a class for styling
-      // Add an icon to the file element
-      // let iconElement = document.createElement('img');
-      // iconElement.src = 'images/description.png'; // Replace with the path to your icon
-      // iconElement.className = 'file-icon'; // Add a class for styling
-
       let textElement = document.createElement('p');
-      // let mainElement = document.createElement('main');
       textElement.textContent = file;
       fileElement.appendChild(textElement);
-      // fileElement.prepend(iconElement);
       fileElement.addEventListener('click', () => {
-        _filepath = file;
-        ipcRenderer.send("opened-recent-document", file);
-        ipcRenderer.send("add-new-recent-document", file);
-        handleDocumentChange(file);
         newTab(file);
+        ipcRenderer.send("open-tab-document", file);
       });
       recentFilesElement.appendChild(fileElement);
     });
@@ -153,7 +140,6 @@ window.addEventListener('DOMContentLoaded', () => {
       return;
     }
     _filepath = filePath;
-    // loadEditor();
     handleDocumentChange(filePath, content);
     autosave();
     if (!currentTabs.includes(filePath)){
@@ -162,7 +148,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   ipcRenderer.on("document-created", (_, filePath) => {
     _filepath = filePath;
-    // loadEditor();
     handleDocumentChange(filePath);
     autosave();
     if (!currentTabs.includes(filePath)){
